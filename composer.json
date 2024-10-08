@@ -1,7 +1,7 @@
 {
   "name": "ferran/loose-challenge",
   "require": {
-    "monolog/monolog": "3.7.0"
+    "illuminate/collections":"10.*"
   },
   "config": {
     "platform":{
