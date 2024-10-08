@@ -39,4 +39,18 @@ class VendingMachine
         print_r($this->insertedMoney->implode(", "));
         return true;
     }
+
+    /**
+     * @param Collection<Item> $items
+     * @param Collection<Coin> $change
+     * @return void
+     */
+    public function service(Collection $items, Collection $change): void
+    {
+        $this->availableChange = $change;
+        $items->each(fn(Item $item) => $this->availableItems->put(
+            $item->getName(),
+            $this->availableItems->get($item->getName())->concat([$item])
+        ));
+    }
 }
