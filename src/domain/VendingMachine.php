@@ -15,29 +15,22 @@ class VendingMachine
 
     /**
      * @param string $key of the item the customer wants
-     * @return bool whether there was any item of that type
+     * @return ?Item if any available
      */
-    public function vendItem(string $key): bool
+    public function vendItem(string $key): ?Item
     {
         if (!$this->availableItems->has($key)) {
-            return false;
+            return null;
         }
-        /** @var Item $item */
-        $item = $this->availableItems->get($key)->shift();
-        print_r($item->getName());
-        return true;
+        return $this->availableItems->get($key)->shift();
     }
 
     /**
-     * @return bool whether there was any money inserted
+     * @return Collection<Coin>
      */
-    public function returnCoin(): bool
+    public function returnCoin(): Collection
     {
-        if ($this->insertedMoney->isEmpty()) {
-            return false;
-        }
-        print_r($this->insertedMoney->implode(", "));
-        return true;
+        return $this->insertedMoney;
     }
 
     /**
