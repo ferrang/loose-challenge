@@ -40,7 +40,7 @@ class VendingMachine
      */
     public function service(Collection $items, Collection $change): void
     {
-        $this->availableChange = $change;
+        $this->availableChange->merge($change);
         $items->each(fn(Item $item) => $this->availableItems->put(
             $item->getName(),
             $this->availableItems->get($item->getName())->concat([$item])
