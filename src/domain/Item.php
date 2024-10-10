@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain;
+namespace LooseChallenge\domain;
 
 class Item
 {

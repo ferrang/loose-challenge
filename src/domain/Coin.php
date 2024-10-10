@@ -2,8 +2,8 @@
 
 namespace Domain;
 
-use Domain\exception\InvalidCoinException;
 use Exception;
+use LooseChallenge\domain\exception\InvalidCoinException;
 
 class Coin
 {

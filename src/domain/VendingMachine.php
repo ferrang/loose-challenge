@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain;
+namespace LooseChallenge\domain;
 
 use Illuminate\Support\Collection;
 

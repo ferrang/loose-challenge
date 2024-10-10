@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\exception;
+namespace LooseChallenge\domain\exception;
 
 use Exception;
 use Throwable;

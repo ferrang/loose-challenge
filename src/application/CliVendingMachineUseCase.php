@@ -1,13 +1,11 @@
 <?php
 
-namespace application;
-
-use Domain\VendingMachine;
+namespace LooseChallenge\application;
 
 class CliVendingMachineUseCase
 {
-    public function execute(string $command): void
+    public function execute(string $command): string
     {
-        // TODO: Fill in
+        return $command;
     }
 }
