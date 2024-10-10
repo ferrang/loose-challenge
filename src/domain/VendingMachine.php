@@ -6,12 +6,25 @@ use Illuminate\Support\Collection;
 
 class VendingMachine
 {
-    /** @var Collection<ItemKey, Collection<Item>> */
-    private Collection $availableItems;
-    /** @var Collection<Coin> */
-    private Collection $availableChange;
-    /** @var Collection<Coin> */
-    private Collection $insertedMoney;
+    public function __construct(
+        /** @var Collection<ItemKey, Collection<Item>> */
+        private readonly Collection $availableItems,
+        /** @var Collection<Coin> */
+        private readonly Collection $availableChange,
+        /** @var Collection<Coin> */
+        private readonly Collection $insertedMoney
+    )
+    {
+    }
+
+    public static function buildEmpty(): VendingMachine
+    {
+        return new VendingMachine(
+            availableItems: collect(),
+            availableChange: collect(),
+            insertedMoney: collect()
+        );
+    }
 
     /**
      * @param string $key of the item the customer wants
@@ -43,7 +56,7 @@ class VendingMachine
         $this->availableChange->merge($change);
         $items->each(fn(Item $item) => $this->availableItems->put(
             $item->getName(),
-            $this->availableItems->get($item->getName())->concat([$item])
+            collect([$item])->concat($this->availableItems->get($item->getName()))
         ));
     }
 }
