@@ -2,6 +2,7 @@
 
 namespace LooseChallenge\domain;
 
+use Exception;
 use Illuminate\Support\Collection;
 
 class VendingMachine
@@ -38,6 +39,7 @@ class VendingMachine
     /**
      * @param string $key of the item the customer wants
      * @return ?Item if any available
+     * @throws Exception
      */
     public function vendItem(string $key): ?Item
     {
@@ -47,10 +49,11 @@ class VendingMachine
 
         // Fetch all items of that type
         $items = $this->availableItems->get($key);
-        if ($this->insertedMoneyIsEnough($items->first()->getPrice())) {
-            // TODO: Return unnecessary money back to user
-            // Empty inserted money
-            $this->insertedMoney = collect();
+        $itemPrice = $items->first()->getPrice();
+        if ($this->insertedMoneyIsEnough($itemPrice)) {
+            // Discount item price from inserted money
+            $changeBack = $this->getRawInsertedMoneyAmount() - $itemPrice;
+            $this->insertedMoney = $this->calculateLeftoverCoins($changeBack);
             // Get one item and return
             return $items->shift();
         }
@@ -84,7 +87,35 @@ class VendingMachine
 
     private function insertedMoneyIsEnough(float $itemPrice): bool
     {
-        $totalMoney = $this->insertedMoney->reduce(fn(?float $carry, Coin $item) => $carry + $item->getValue());
-        return $totalMoney >= $itemPrice;
+        return $this->getRawInsertedMoneyAmount() >= $itemPrice;
+    }
+
+    private function getRawInsertedMoneyAmount(): float
+    {
+        return $this->insertedMoney->reduce(fn(?float $carry, Coin $item) => $carry + $item->getValue());
+    }
+
+    /**
+     * @param float $amount
+     * @return Collection<Coin>
+     * @throws Exception
+     */
+    private function calculateLeftoverCoins(float $amount): Collection
+    {
+        $validCoins = Coin::$validValues;
+        $result = collect();
+        // Sort coins in descending order to start with the largest
+        rsort($validCoins);
+        // Convert the amount to cents to avoid floating-point precision issues
+        $amountInCents = round($amount * 100);
+        foreach ($validCoins as $coinValue) {
+            $coinInCents = round($coinValue * 100);
+            while ($amountInCents >= $coinInCents) {
+                $result->push(new Coin($coinValue));
+                $amountInCents -= $coinInCents;
+            }
+        }
+
+        return $result;
     }
 }

@@ -24,7 +24,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_buySomethingOnEmptyMachine_shouldReturnErrorMessage()
+    public function test_buyOnEmptyMachine_shouldReturnErrorMessage()
     {
         $command = "1, 0.25, 0.25, GET-SODA";
 
@@ -36,7 +36,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_buySodaWithExactChange_shouldReturnItem()
+    public function test_buyWithExactChange_shouldReturnItem()
     {
         $command = "1, 0.25, 0.25, GET-SODA";
         $this->vendingMachine->service(
@@ -52,7 +52,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_buySodaWithExactChange_shouldLeaveVendingMachineWithMoneyAvailable()
+    public function test_buyWithExactChange_shouldLeaveVendingMachineWithMoneyAvailable()
     {
         $command = "1, 0.25, 0.25, GET-SODA";
         $this->vendingMachine->service(
@@ -77,5 +77,21 @@ class CliVendingMachineUseCaseTest extends TestCase
 
         $this->assertEquals("0.10, 0.10", $result);
         $this->assertEmpty($this->vendingMachine->getInsertedMoney());
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_buyWithChange_shouldReturnExceedingMoneyBackToUser()
+    {
+        $command = "1, GET-WATER";
+        $this->vendingMachine->service(
+            items: collect([new Item(key: ItemKey::WATER, price: 0.65)]),
+            change: collect()
+        );
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals("WATER, 0.25, 0.10", $result);
     }
 }

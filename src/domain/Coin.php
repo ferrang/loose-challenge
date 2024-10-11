@@ -7,7 +7,7 @@ use LooseChallenge\domain\exception\InvalidCoinException;
 
 class Coin
 {
-    private static array $validValues = array(.05, .10, .25, 1);
+    public static array $validValues = array(.05, .10, .25, 1);
     private float $value;
 
     /**

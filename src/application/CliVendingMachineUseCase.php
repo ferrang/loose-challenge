@@ -70,14 +70,13 @@ class CliVendingMachineUseCase
             $desiredItem = explode('-', $action)[1];
             $item = $this->vendingMachine->vendItem($desiredItem);
             if (!is_null($item)) {
-                return $item->getName();
+                $changeBack = $this->getChangeBackFromVendingMachine();
+                return $changeBack ? "{$item->getName()}, $changeBack" : $item->getName();
             }
             return "No $desiredItem found, please try again later.";
         }
         if ($this->isGiveMoneyBack($action)) {
-            return $this->vendingMachine->getInsertedMoney()->map(
-                fn(Coin $coin) => number_format($coin->getValue(), 2, '.', '')
-            )->implode(', ');
+            return $this->getChangeBackFromVendingMachine();
         }
         // If we got here something didn't work as expected
         return "This action does not exist, apologies.";
@@ -108,5 +107,15 @@ class CliVendingMachineUseCase
     private function isService(string $action): bool
     {
         return str_starts_with($action, 'SERVICE');
+    }
+
+    /**
+     * @return string
+     */
+    public function getChangeBackFromVendingMachine(): string
+    {
+        return $this->vendingMachine->getInsertedMoney()->map(
+            fn(Coin $coin) => number_format($coin->getValue(), 2, '.', '')
+        )->implode(', ');
     }
 }
