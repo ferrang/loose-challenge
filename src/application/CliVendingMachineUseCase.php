@@ -20,10 +20,9 @@ class CliVendingMachineUseCase
     public function execute(string $command): string
     {
         try {
-            // Collect coins and identify action
             $result = $this->collectMoneyAndGetAction($command);
-            $action = $result['action'];
             $money = $result['money'];
+            $action = $result['action'];
             if (empty($action)) {
                 return "No action identified, exiting.";
             }
@@ -62,23 +61,48 @@ class CliVendingMachineUseCase
 
     private function processAction(string $action, Collection $money): string
     {
-        // Process action
-        if (str_starts_with($action, 'GET-')) {
-            // Vend
+        if ($this->isVending($action)) {
             $desiredItem = explode('-', $action)[1];
-            $item = $this->vendingMachine->vendItem($desiredItem);
+            $item = $this->vendingMachine->vendItem($desiredItem, $money);
             if (!is_null($item)) {
                 return $item->getName();
             }
             return "No $desiredItem found, please try again later.";
         }
-        if (str_starts_with($action, 'RETURN-')) {
-            // Give money back
+        if ($this->isGiveMoneyBack($action)) {
+            // TODO: Give money back
         }
-        if (str_starts_with($action, 'SERVICE')) {
-            // Service
+        if ($this->isService($action)) {
+            // TODO: Service
         }
         // If we got here something didn't work as expected
         return "This action does not exist, apologies.";
+    }
+
+    /**
+     * @param string $action
+     * @return bool
+     */
+    private function isVending(string $action): bool
+    {
+        return str_starts_with($action, 'GET-');
+    }
+
+    /**
+     * @param string $action
+     * @return bool
+     */
+    private function isGiveMoneyBack(string $action): bool
+    {
+        return str_starts_with($action, 'RETURN-');
+    }
+
+    /**
+     * @param string $action
+     * @return bool
+     */
+    private function isService(string $action): bool
+    {
+        return str_starts_with($action, 'SERVICE');
     }
 }

@@ -10,9 +10,9 @@ class VendingMachine
         /** @var Collection<ItemKey, Collection<Item>> */
         private readonly Collection $availableItems,
         /** @var Collection<Coin> */
-        private readonly Collection $availableChange,
+        private Collection $availableChange,
         /** @var Collection<Coin> */
-        private readonly Collection $insertedMoney
+        private Collection $insertedMoney
     )
     {
     }
@@ -28,14 +28,28 @@ class VendingMachine
 
     /**
      * @param string $key of the item the customer wants
+     * @param Collection<Coin> $money
      * @return ?Item if any available
      */
-    public function vendItem(string $key): ?Item
+    public function vendItem(string $key, Collection $money): ?Item
     {
         if (!$this->availableItems->has($key)) {
             return null;
         }
-        return $this->availableItems->get($key)->shift();
+
+        // Use inserted money
+        $this->insertedMoney = $this->insertedMoney->merge($money);
+        // Fetch all items of that type
+        $items = $this->availableItems->get($key);
+        if ($this->insertedMoneyIsEnough($items->first()->getPrice())) {
+            // TODO: Return unnecessary money back to user
+            // Empty inserted money
+            $this->insertedMoney = collect();
+            // Get one item and return
+            return $items->shift();
+        }
+        // Not enough money :(
+        return null;
     }
 
     /**
@@ -53,10 +67,16 @@ class VendingMachine
      */
     public function service(Collection $items, Collection $change): void
     {
-        $this->availableChange->merge($change);
+        $this->availableChange = $this->availableChange->merge($change);
         $items->each(fn(Item $item) => $this->availableItems->put(
             $item->getName(),
             collect([$item])->concat($this->availableItems->get($item->getName()))
         ));
+    }
+
+    private function insertedMoneyIsEnough(float $itemPrice): bool
+    {
+        $totalMoney = $this->insertedMoney->reduce(fn(?float $carry, Coin $item) => $carry + $item->getValue());
+        return $totalMoney >= $itemPrice;
     }
 }

@@ -24,9 +24,4 @@ class Item
     {
         return $this->price;
     }
-
-    public function getSelector(): string
-    {
-        return $this->selector;
-    }
 }

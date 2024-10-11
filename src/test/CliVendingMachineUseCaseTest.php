@@ -3,10 +3,12 @@
 namespace LooseChallenge\test;
 
 use LooseChallenge\application\CliVendingMachineUseCase;
+use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\Item;
 use LooseChallenge\domain\ItemKey;
 use LooseChallenge\domain\VendingMachine;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class CliVendingMachineUseCaseTest extends TestCase
 {
@@ -19,7 +21,10 @@ class CliVendingMachineUseCaseTest extends TestCase
         $this->useCase = new CliVendingMachineUseCase($this->vendingMachine);
     }
 
-    public function test_buySomethingOnEmptyMachineReturnsErrorMessage()
+    /**
+     * @throws Throwable
+     */
+    public function test_buySomethingOnEmptyMachine_shouldReturnErrorMessage()
     {
         $command = "1, 0.25, 0.25, GET-SODA";
 
@@ -28,7 +33,10 @@ class CliVendingMachineUseCaseTest extends TestCase
         $this->assertEquals('No SODA found, please try again later.', $result);
     }
 
-    public function test_buySodaWithExactChange()
+    /**
+     * @throws Throwable
+     */
+    public function test_buySodaWithExactChange_shouldReturnItem()
     {
         $command = "1, 0.25, 0.25, GET-SODA";
         $this->vendingMachine->service(
@@ -39,5 +47,22 @@ class CliVendingMachineUseCaseTest extends TestCase
         $result = $this->useCase->execute($command);
 
         $this->assertEquals("SODA", $result);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_buySodaWithExactChange_shouldLeaveVendingMachineWithMoneyAvailable()
+    {
+        $command = "1, 0.25, 0.25, GET-SODA";
+        $this->vendingMachine->service(
+            items: collect([new Item(key: ItemKey::SODA, price: 1.50)]),
+            change: collect()
+        );
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals("SODA", $result);
+        $this->assertEmpty($this->vendingMachine->returnCoin());
     }
 }
