@@ -63,6 +63,19 @@ class CliVendingMachineUseCaseTest extends TestCase
         $result = $this->useCase->execute($command);
 
         $this->assertEquals("SODA", $result);
-        $this->assertEmpty($this->vendingMachine->returnCoin());
+        $this->assertEmpty($this->vendingMachine->getInsertedMoney());
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_returnCoin_shouldGiveBackAllCoinsInserted()
+    {
+        $command = "0.10, 0.10, RETURN-COIN";
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals("0.10, 0.10", $result);
+        $this->assertEmpty($this->vendingMachine->getInsertedMoney());
     }
 }

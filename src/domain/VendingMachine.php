@@ -27,18 +27,24 @@ class VendingMachine
     }
 
     /**
+     * @param Collection $money
+     * @return void
+     */
+    public function insertMoney(Collection $money): void
+    {
+        $this->insertedMoney = $this->insertedMoney->merge($money);
+    }
+
+    /**
      * @param string $key of the item the customer wants
-     * @param Collection<Coin> $money
      * @return ?Item if any available
      */
-    public function vendItem(string $key, Collection $money): ?Item
+    public function vendItem(string $key): ?Item
     {
         if (!$this->availableItems->has($key)) {
             return null;
         }
 
-        // Use inserted money
-        $this->insertedMoney = $this->insertedMoney->merge($money);
         // Fetch all items of that type
         $items = $this->availableItems->get($key);
         if ($this->insertedMoneyIsEnough($items->first()->getPrice())) {
@@ -55,9 +61,11 @@ class VendingMachine
     /**
      * @return Collection<Coin>
      */
-    public function returnCoin(): Collection
+    public function getInsertedMoney(): Collection
     {
-        return $this->insertedMoney;
+        $insertedMoney = $this->insertedMoney;
+        $this->insertedMoney = collect();
+        return $insertedMoney;
     }
 
     /**

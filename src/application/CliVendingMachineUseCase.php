@@ -61,19 +61,23 @@ class CliVendingMachineUseCase
 
     private function processAction(string $action, Collection $money): string
     {
+        if ($this->isService($action)) {
+            // TODO: Service
+        }
+
+        $this->vendingMachine->insertMoney($money);
         if ($this->isVending($action)) {
             $desiredItem = explode('-', $action)[1];
-            $item = $this->vendingMachine->vendItem($desiredItem, $money);
+            $item = $this->vendingMachine->vendItem($desiredItem);
             if (!is_null($item)) {
                 return $item->getName();
             }
             return "No $desiredItem found, please try again later.";
         }
         if ($this->isGiveMoneyBack($action)) {
-            // TODO: Give money back
-        }
-        if ($this->isService($action)) {
-            // TODO: Service
+            return $this->vendingMachine->getInsertedMoney()->map(
+                fn(Coin $coin) => number_format($coin->getValue(), 2, '.', '')
+            )->implode(', ');
         }
         // If we got here something didn't work as expected
         return "This action does not exist, apologies.";
