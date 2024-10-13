@@ -1,5 +1,6 @@
 {
   "name": "ferran/loose-challenge",
+  "description": "Ferran's challenge for vending machines",
   "require": {
     "illuminate/collections":"10.*"
   },
