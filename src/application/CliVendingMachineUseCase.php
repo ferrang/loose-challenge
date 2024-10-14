@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\exception\InvalidCoinException;
+use LooseChallenge\domain\exception\ProductNotAvailableException;
 use LooseChallenge\domain\VendingMachine;
 use Throwable;
 
@@ -75,13 +76,16 @@ class CliVendingMachineUseCase
     {
         $this->vendingMachine->insertMoney($money);
         if ($this->isVending($action)) {
-            $desiredItem = explode('-', $action)[1];
-            $item = $this->vendingMachine->vendItem($desiredItem);
+            try {
+                $item = $this->vendingMachine->vendItem(selector: $action);
+            } catch (ProductNotAvailableException $e) {
+                return "Product not available: {$e->getMessage()}";
+            }
             if (!is_null($item)) {
                 $changeBack = $this->getChangeBackFromVendingMachine();
                 return $changeBack ? "{$item->getName()}, $changeBack" : $item->getName();
             }
-            return "No $desiredItem found, please try again later.";
+            return "No $action found, please try again later.";
         }
         if ($this->isGiveMoneyBack($action)) {
             return $this->getChangeBackFromVendingMachine();

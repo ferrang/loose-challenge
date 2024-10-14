@@ -4,6 +4,7 @@ namespace LooseChallenge\domain;
 
 use Exception;
 use Illuminate\Support\Collection;
+use LooseChallenge\domain\exception\ProductNotAvailableException;
 
 class VendingMachine
 {
@@ -48,14 +49,15 @@ class VendingMachine
     }
 
     /**
-     * @param string $key of the item the customer wants
+     * @param string $selector of the item the customer wants
      * @return ?Item if any available
-     * @throws Exception
+     * @throws ProductNotAvailableException
      */
-    public function vendItem(string $key): ?Item
+    public function vendItem(string $selector): ?Item
     {
+        $key = explode('-', $selector)[1];
         if (!$this->availableItems->has($key)) {
-            return null;
+            throw new ProductNotAvailableException($key);
         }
 
         // Fetch all items of that type

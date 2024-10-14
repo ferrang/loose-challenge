@@ -26,7 +26,7 @@ class CliVendingMachineUseCaseTest extends TestCase
 
         $result = $this->useCase->execute($command);
 
-        $this->assertEquals('No SODA found, please try again later.', $result);
+        $this->assertEquals('Product not available: No SODA available at the moment.', $result);
     }
 
     /**
