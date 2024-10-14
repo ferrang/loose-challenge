@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\exception\InvalidCoinException;
+use LooseChallenge\domain\exception\NotEnoughMoneyException;
 use LooseChallenge\domain\exception\ProductNotAvailableException;
 use LooseChallenge\domain\VendingMachine;
 use Throwable;
@@ -39,7 +40,11 @@ class CliVendingMachineUseCase
             if (empty($action)) {
                 return "No action identified, exiting.";
             }
-            return $this->processUserAction($action, $money);
+            try {
+                return $this->processUserAction($action, $money);
+            } catch (NotEnoughMoneyException $e) {
+                return "Not enough money: {$e->getMessage()}";
+            }
         } catch (Throwable $e) {
             print_r("Something happened: {$e->getMessage()}");
             throw $e;

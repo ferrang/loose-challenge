@@ -4,6 +4,7 @@ namespace LooseChallenge\domain;
 
 use Exception;
 use Illuminate\Support\Collection;
+use LooseChallenge\domain\exception\NotEnoughMoneyException;
 use LooseChallenge\domain\exception\ProductNotAvailableException;
 
 class VendingMachine
@@ -70,8 +71,8 @@ class VendingMachine
             // Get one item and return
             return $items->shift();
         }
-        // Not enough money :(
-        return null;
+
+        throw new NotEnoughMoneyException($key, $itemPrice);
     }
 
     /**

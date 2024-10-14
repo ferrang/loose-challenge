@@ -41,6 +41,19 @@ class CliVendingMachineUseCaseTest extends TestCase
         $this->assertEquals('Invalid coin: Only 0.05, 0.1, 0.25, 1 coins are permitted.', $result);
     }
 
+    public function test_buyWithNotEnoughMoney_shouldReturnErrorMessage()
+    {
+        $command = "0.05, GET-SODA";
+        $this->vendingMachine->service(
+            itemKeys: collect(ItemKey::SODA),
+            change: collect()
+        );
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals("Not enough money: You need to insert 1.5 to acquire SODA", $result);
+    }
+
     /**
      * @throws Throwable
      */
