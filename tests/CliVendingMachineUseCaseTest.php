@@ -32,6 +32,18 @@ class CliVendingMachineUseCaseTest extends TestCase
     /**
      * @throws Throwable
      */
+    public function test_buyWithInvalidCoin_shouldReturnErrorMessage()
+    {
+        $command = "0.50, 0.50, 0.50, GET-SODA";
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals('Invalid coin: Only 0.05, 0.1, 0.25, 1 coins are permitted.', $result);
+    }
+
+    /**
+     * @throws Throwable
+     */
     public function test_buyWithExactChange_shouldReturnItem()
     {
         $command = "1, 0.25, 0.25, GET-SODA";

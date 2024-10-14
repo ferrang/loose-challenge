@@ -5,6 +5,7 @@ namespace LooseChallenge\application;
 use Exception;
 use Illuminate\Support\Collection;
 use LooseChallenge\domain\Coin;
+use LooseChallenge\domain\exception\InvalidCoinException;
 use LooseChallenge\domain\VendingMachine;
 use Throwable;
 
@@ -15,6 +16,7 @@ class CliVendingMachineUseCase
     }
 
     /**
+     * @throws InvalidCoinException if any coin inserted was not accepted
      * @throws Throwable
      */
     public function execute(string $command): string
@@ -26,7 +28,11 @@ class CliVendingMachineUseCase
                 // 2. Get products
                 return "service";
             }
-            $result = $this->collectMoneyAndGetAction($command);
+            try {
+                $result = $this->collectMoneyAndGetAction($command);
+            } catch (InvalidCoinException $e) {
+                return "Invalid coin: {$e->getMessage()}";
+            }
             $money = $result['money'];
             $action = $result['action'];
             if (empty($action)) {
