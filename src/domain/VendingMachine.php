@@ -7,23 +7,34 @@ use Illuminate\Support\Collection;
 
 class VendingMachine
 {
+    private static array $prices = [
+        'WATER' => .65,
+        'JUICE' => 1,
+        'SODA' => 1.5,
+    ];
+
+    /** @var Collection<ItemKey, Collection<Item>> */
+    private Collection $availableItems;
+
+    /** @var Collection<Coin> */
+    private Collection $insertedMoney;
+
     public function __construct(
-        /** @var Collection<ItemKey, Collection<Item>> */
-        private readonly Collection $availableItems,
+        /** @var Collection<ItemKey> */
+        readonly Collection $itemKeys,
         /** @var Collection<Coin> */
-        private Collection $availableChange,
-        /** @var Collection<Coin> */
-        private Collection $insertedMoney
+        private Collection  $availableChange,
     )
     {
+        $this->availableItems = $this->buildItemsFromKeys($itemKeys);
+        $this->insertedMoney = collect();
     }
 
     public static function buildEmpty(): VendingMachine
     {
         return new VendingMachine(
-            availableItems: collect(),
+            itemKeys: collect(),
             availableChange: collect(),
-            insertedMoney: collect()
         );
     }
 
@@ -72,14 +83,14 @@ class VendingMachine
     }
 
     /**
-     * @param Collection<Item> $items
+     * @param Collection<ItemKey> $itemKeys
      * @param Collection<Coin> $change
      * @return void
      */
-    public function service(Collection $items, Collection $change): void
+    public function service(Collection $itemKeys, Collection $change): void
     {
         $this->availableChange = $this->availableChange->merge($change);
-        $items->each(fn(Item $item) => $this->availableItems->put(
+        $this->buildItemsFromKeys($itemKeys)->each(fn(Item $item) => $this->availableItems->put(
             $item->getName(),
             collect([$item])->concat($this->availableItems->get($item->getName()))
         ));
@@ -117,5 +128,14 @@ class VendingMachine
         }
 
         return $result;
+    }
+
+    /**
+     * @param Collection $items
+     * @return Collection
+     */
+    private function buildItemsFromKeys(Collection $items): Collection
+    {
+        return $items->map(fn(ItemKey $key) => new Item($key, self::$prices[$key->name]));
     }
 }

@@ -48,7 +48,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     {
         $command = "1, 0.25, 0.25, GET-SODA";
         $this->vendingMachine->service(
-            items: collect([new Item(key: ItemKey::SODA, price: 1.50)]),
+            itemKeys: collect(ItemKey::SODA),
             change: collect()
         );
 
@@ -64,7 +64,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     {
         $command = "1, 0.25, 0.25, GET-SODA";
         $this->vendingMachine->service(
-            items: collect([new Item(key: ItemKey::SODA, price: 1.50)]),
+            itemKeys: collect(ItemKey::SODA),
             change: collect()
         );
 
@@ -94,7 +94,7 @@ class CliVendingMachineUseCaseTest extends TestCase
     {
         $command = "1, GET-WATER";
         $this->vendingMachine->service(
-            items: collect([new Item(key: ItemKey::WATER, price: 0.65)]),
+            itemKeys: collect(ItemKey::WATER),
             change: collect()
         );
 
