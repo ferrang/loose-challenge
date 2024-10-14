@@ -1,14 +1,10 @@
-<?php
-
-namespace LooseChallenge\test;
+<?php declare(strict_types=1);
 
 use LooseChallenge\application\CliVendingMachineUseCase;
-use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\Item;
 use LooseChallenge\domain\ItemKey;
 use LooseChallenge\domain\VendingMachine;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
 class CliVendingMachineUseCaseTest extends TestCase
 {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace LooseChallenge\domain;
 
@@ -92,7 +92,7 @@ class VendingMachine
 
     private function getRawInsertedMoneyAmount(): float
     {
-        return $this->insertedMoney->reduce(fn(?float $carry, Coin $item) => $carry + $item->getValue());
+        return (float)$this->insertedMoney->reduce(fn(?float $carry, Coin $item) => $carry + $item->getValue());
     }
 
     /**

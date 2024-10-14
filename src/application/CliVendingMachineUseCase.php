@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace LooseChallenge\application;
 
@@ -48,7 +48,7 @@ class CliVendingMachineUseCase
         $parts->each(function ($part) use (&$result) {
             if (is_numeric($part)) {
                 // Collect coin and continue
-                $result['money']->push(new Coin($part));
+                $result['money']->push(new Coin((float)$part));
                 return true;
             } else {
                 // Found the action, exit
