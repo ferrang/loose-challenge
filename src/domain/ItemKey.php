@@ -2,9 +2,9 @@
 
 namespace LooseChallenge\domain;
 
-enum ItemKey
+enum ItemKey: string
 {
-    case WATER;
-    case JUICE;
-    case SODA;
+    case WATER = 'WATER';
+    case JUICE = 'JUICE';
+    case SODA = 'SODA';
 }

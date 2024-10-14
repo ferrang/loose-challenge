@@ -41,7 +41,7 @@ class VendingMachine
     }
 
     /**
-     * @param Collection $money
+     * @param Collection<Coin> $money
      * @return void
      */
     public function insertMoney(Collection $money): void
@@ -52,7 +52,8 @@ class VendingMachine
     /**
      * @param string $selector of the item the customer wants
      * @return ?Item if any available
-     * @throws ProductNotAvailableException
+     * @throws ProductNotAvailableException|NotEnoughMoneyException
+     * @throws Exception
      */
     public function vendItem(string $selector): ?Item
     {
@@ -83,6 +84,14 @@ class VendingMachine
         $insertedMoney = $this->insertedMoney;
         $this->insertedMoney = collect();
         return $insertedMoney;
+    }
+
+    /**
+     * @return Collection<Coin>
+     */
+    public function getAvailableChange(): Collection
+    {
+        return $this->availableChange;
     }
 
     /**
@@ -134,11 +143,11 @@ class VendingMachine
     }
 
     /**
-     * @param Collection $items
+     * @param Collection $keys
      * @return Collection
      */
-    private function buildItemsFromKeys(Collection $items): Collection
+    private function buildItemsFromKeys(Collection $keys): Collection
     {
-        return $items->map(fn(ItemKey $key) => new Item($key, self::$prices[$key->name]));
+        return $keys->map(fn(ItemKey $key) => new Item($key, self::$prices[$key->name]));
     }
 }

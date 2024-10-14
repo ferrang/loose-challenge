@@ -8,6 +8,8 @@ use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\exception\InvalidCoinException;
 use LooseChallenge\domain\exception\NotEnoughMoneyException;
 use LooseChallenge\domain\exception\ProductNotAvailableException;
+use LooseChallenge\domain\Item;
+use LooseChallenge\domain\ItemKey;
 use LooseChallenge\domain\VendingMachine;
 use Throwable;
 
@@ -25,10 +27,12 @@ class CliVendingMachineUseCase
     {
         try {
             if ($this->isService($command)) {
-                // TODO: Service
-                // 1. Get money
-                // 2. Get products
-                return "service";
+                $result = $this->collectMoneyAndItems($command);
+                $this->vendingMachine->service(
+                    itemKeys: $result['items'],
+                    change: $result['money']
+                );
+                return "OK";
             }
             try {
                 $result = $this->collectMoneyAndGetAction($command);
@@ -56,7 +60,36 @@ class CliVendingMachineUseCase
      * @return Collection
      * @throws Exception
      */
-    public function collectMoneyAndGetAction(string $command): Collection
+    private function collectMoneyAndItems(string $command): Collection
+    {
+        $result = collect([
+            'items' => collect(),
+            'money' => collect()
+        ]);
+        $parts = collect(explode(", ", $command));
+        $parts->each(function ($part) use (&$result) {
+            if (is_numeric($part)) {
+                // Collect coin and continue
+                $result['money']->push(new Coin((float)$part));
+                return true;
+            } elseif ($part === "SERVICE") {
+                // Found the action, from here it will be items
+                $result['action'] = $part;
+                return false;
+            } else {
+                $result['items']->push(ItemKey::from($part));
+                return true;
+            }
+        });
+        return $result;
+    }
+
+    /**
+     * @param string $command
+     * @return Collection
+     * @throws Exception
+     */
+    private function collectMoneyAndGetAction(string $command): Collection
     {
         $result = collect([
             'action' => "",
@@ -123,7 +156,7 @@ class CliVendingMachineUseCase
      */
     private function isService(string $action): bool
     {
-        return str_starts_with($action, 'SERVICE');
+        return str_contains($action, 'SERVICE');
     }
 
     /**
