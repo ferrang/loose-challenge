@@ -20,13 +20,19 @@ class CliVendingMachineUseCase
     public function execute(string $command): string
     {
         try {
+            if ($this->isService($command)) {
+                // TODO: Service
+                // 1. Get money
+                // 2. Get products
+                return "service";
+            }
             $result = $this->collectMoneyAndGetAction($command);
             $money = $result['money'];
             $action = $result['action'];
             if (empty($action)) {
                 return "No action identified, exiting.";
             }
-            return $this->processAction($action, $money);
+            return $this->processUserAction($action, $money);
         } catch (Throwable $e) {
             print_r("Something happened: {$e->getMessage()}");
             throw $e;
@@ -59,12 +65,8 @@ class CliVendingMachineUseCase
         return $result;
     }
 
-    private function processAction(string $action, Collection $money): string
+    private function processUserAction(string $action, Collection $money): string
     {
-        if ($this->isService($action)) {
-            // TODO: Service
-        }
-
         $this->vendingMachine->insertMoney($money);
         if ($this->isVending($action)) {
             $desiredItem = explode('-', $action)[1];
