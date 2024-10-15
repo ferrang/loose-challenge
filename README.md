@@ -1,24 +1,26 @@
 # Loose Challenge
 
 ## Vending Machine
-The goal of this program is to model a vending machine and the state it must maintain during its operation. How exactly the actions on the machine are driven is left intentionally vague and is up to the candidate
-
-The machine works like all vending machines: it takes money then gives you items. The vending machine accepts money in the form of 0.05, 0.10, 0.25 and 1
-
-You must have at least have 3 primary items that cost 0.65, 1.00, and 1.50. Also user may hit the button “return coin” to get back the money they’ve entered so far, If you put more money in than the item price, you get the item and change back.
+- The goal of this program is to model a vending machine and the state it must maintain during its operation.
+- The machine works like all vending machines: it takes money then gives you items. The vending machine accepts money in the form of 0.05, 0.10, 0.25 and 1.
+- The current 3 primary items available are:
+  - Water (0.65),
+  - Juice(1.00),
+  - Soda(1.50)
+- Also user may hit the button “return coin” to get back the money they’ve entered so far, If you put more money in than the item price, you get the item and change back.
 
 ## Specification
 ### Valid set of actions on the vending machine are:
 - 0.05, 0.10, 0.25, 1 - insert money
 - Return Coin - returns all inserted money
-- GET Water, GET Juice, GET Soda - select item (Water = 0.65, Juice = 1.00, Soda = 1.50)
+- GET Water, GET Juice, GET Soda - select item
 - SERVICE - a service person opens the machine and set the available change and how many items we have.
 
 ### Valid set of responses on the vending machine are:
 - 0.05, 0.10, 0.25 - return coin
 - Water, Juice, Soda - vend item
 
-### Vending machine must track the following state:
+### Vending machine tracks the following state:
 - Available items - each item has a count, a price and selector
 - Available change - Number os coins available
 - Currently inserted money
