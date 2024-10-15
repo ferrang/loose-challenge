@@ -3,7 +3,6 @@
 use LooseChallenge\application\CliVendingMachineUseCase;
 use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\exception\InvalidCoinException;
-use LooseChallenge\domain\Item;
 use LooseChallenge\domain\ItemKey;
 use LooseChallenge\domain\VendingMachine;
 use PHPUnit\Framework\TestCase;
