@@ -48,7 +48,11 @@ Example 5: Service with change and new products
 -> OK
 ````
 
+### Requirements
+This project requires php 8.1 and composer installed. A Dockerized version will be supported soon.
+
 ### Run the tests
 ```
-./vendor/bin/phpunit/ tests
+composer install
+./vendor/bin/phpunit tests
 ```
