@@ -44,11 +44,7 @@ class CliVendingMachineUseCase
             if (empty($action)) {
                 return "No action identified, exiting.";
             }
-            try {
-                return $this->processUserAction($action, $money);
-            } catch (NotEnoughMoneyException $e) {
-                return "Not enough money: {$e->getMessage()}";
-            }
+            return $this->processUserAction($action, $money);
         } catch (Throwable $e) {
             print_r("Something happened: {$e->getMessage()}");
             throw $e;
@@ -74,12 +70,15 @@ class CliVendingMachineUseCase
                 return true;
             } elseif ($part === "SERVICE") {
                 // Found the action, from here it will be items
-                $result['action'] = $part;
+                return true;
+            } elseif ($part === 'DONE') {
+                // Found the end, break
                 return false;
-            } else {
+            } elseif (!is_null(ItemKey::tryFrom($part))) {
                 $result['items']->push(ItemKey::from($part));
                 return true;
             }
+            return true;
         });
         return $result;
     }
@@ -118,6 +117,8 @@ class CliVendingMachineUseCase
                 $item = $this->vendingMachine->vendItem(selector: $action);
             } catch (ProductNotAvailableException $e) {
                 return "Product not available: {$e->getMessage()}";
+            } catch (NotEnoughMoneyException $e) {
+                return "Not enough money: {$e->getMessage()}";
             }
             if (!is_null($item)) {
                 $changeBack = $this->getChangeBackFromVendingMachine();

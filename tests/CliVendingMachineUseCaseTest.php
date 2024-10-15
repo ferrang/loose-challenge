@@ -3,6 +3,7 @@
 use LooseChallenge\application\CliVendingMachineUseCase;
 use LooseChallenge\domain\Coin;
 use LooseChallenge\domain\exception\InvalidCoinException;
+use LooseChallenge\domain\Item;
 use LooseChallenge\domain\ItemKey;
 use LooseChallenge\domain\VendingMachine;
 use PHPUnit\Framework\TestCase;
@@ -129,6 +130,7 @@ class CliVendingMachineUseCaseTest extends TestCase
 
         $this->assertEquals("OK", $result);
         $this->assertEmpty($this->vendingMachine->getInsertedMoney());
+        $this->assertEmpty($this->vendingMachine->getAvailableItems());
         $this->assertEquals(collect([
             new Coin(0.1),
             new Coin(0.1),
@@ -137,5 +139,29 @@ class CliVendingMachineUseCaseTest extends TestCase
             new Coin(.25),
             new Coin(.25),
             ]), $this->vendingMachine->getAvailableChange());
+    }
+
+    /**
+     * @throws Throwable
+     * @throws InvalidCoinException
+     */
+    public function test_serviceWithChangeAndItems_shouldStoreBothAndReturnOk()
+    {
+        $command = "0.10, 0.10, 0.25, SERVICE, SODA, WATER, WATER, JUICE, DONE";
+
+        $result = $this->useCase->execute($command);
+
+        $this->assertEquals("OK", $result);
+        $this->assertEmpty($this->vendingMachine->getInsertedMoney());
+        $this->assertEquals(collect([
+            new Coin(0.1),
+            new Coin(0.1),
+            new Coin(.25),
+        ]), $this->vendingMachine->getAvailableChange());
+        $this->assertEquals(collect([
+            'SODA' => 1,
+            'WATER' => 2,
+            'JUICE' => 1,
+        ]), $this->vendingMachine->getAvailableItems());
     }
 }

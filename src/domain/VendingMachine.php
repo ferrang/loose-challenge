@@ -77,6 +77,15 @@ class VendingMachine
     }
 
     /**
+     * @return Collection<ItemKey, Int> map of key to number of items for that key
+     */
+    public function getAvailableItems(): Collection
+    {
+        if ($this->availableItems->isEmpty()) return collect();
+        return $this->availableItems->map(fn(Collection $items) => $items->count());
+    }
+
+    /**
      * @return Collection<Coin>
      */
     public function getInsertedMoney(): Collection
@@ -102,10 +111,13 @@ class VendingMachine
     public function service(Collection $itemKeys, Collection $change): void
     {
         $this->availableChange = $this->availableChange->merge($change);
-        $this->buildItemsFromKeys($itemKeys)->each(fn(Item $item) => $this->availableItems->put(
-            $item->getName(),
-            collect([$item])->concat($this->availableItems->get($item->getName()))
-        ));
+        $this->buildItemsFromKeys($itemKeys)->each(function (Item $item): void {
+            if ($this->availableItems->has($item->getName())) {
+                $this->availableItems[$item->getName()] = $this->availableItems[$item->getName()]->merge([$item]);
+            } else {
+                $this->availableItems[$item->getName()] = collect([$item]);
+            }
+        });
     }
 
     private function insertedMoneyIsEnough(float $itemPrice): bool
@@ -148,6 +160,7 @@ class VendingMachine
      */
     private function buildItemsFromKeys(Collection $keys): Collection
     {
+        if ($keys->isEmpty()) return collect();
         return $keys->map(fn(ItemKey $key) => new Item($key, self::$prices[$key->name]));
     }
 }
